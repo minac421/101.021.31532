@@ -1,0 +1,220 @@
+{
+  "hypothesis": "H-004",
+  "period": "2020-01-01 -> 2025-06-29 (holding days; data 2019-09 -> 2025-06)",
+  "universe": {
+    "symbols_in_archive_range": 510,
+    "symbols_ever_in_universe": 211,
+    "universe_members_that_stopped_trading": [
+      "ALPACAUSDT",
+      "FTTUSDT",
+      "LENDUSDT",
+      "LUNAUSDT"
+    ]
+  },
+  "strategy": {
+    "days": 1975,
+    "total_return": 1.2639,
+    "ann_return": 0.1697,
+    "ann_vol": 0.193,
+    "sharpe": 0.879,
+    "t_stat": 2.045,
+    "max_drawdown": 0.2543,
+    "avg_gross_exposure": 0.217,
+    "avg_positions": 10.78,
+    "avg_daily_turnover": 0.0448,
+    "funding_drag_ann": 0.0336,
+    "forced_exits_while_held": 1,
+    "funding_fallback_position_days": 44
+  },
+  "strategy_by_year": {
+    "2020": {
+      "days": 334,
+      "total_return": 0.2738,
+      "ann_return": 0.2929,
+      "ann_vol": 0.2377,
+      "sharpe": 1.232,
+      "t_stat": 1.179,
+      "max_drawdown": 0.1676
+    },
+    "2021": {
+      "days": 365,
+      "total_return": 0.5595,
+      "ann_return": 0.4675,
+      "ann_vol": 0.2136,
+      "sharpe": 2.188,
+      "t_stat": 2.188,
+      "max_drawdown": 0.1212
+    },
+    "2022": {
+      "days": 365,
+      "total_return": -0.199,
+      "ann_return": -0.2097,
+      "ann_vol": 0.1557,
+      "sharpe": -1.346,
+      "t_stat": -1.346,
+      "max_drawdown": 0.2066
+    },
+    "2023": {
+      "days": 365,
+      "total_return": 0.305,
+      "ann_return": 0.2848,
+      "ann_vol": 0.1934,
+      "sharpe": 1.473,
+      "t_stat": 1.473,
+      "max_drawdown": 0.1617
+    },
+    "2024": {
+      "days": 366,
+      "total_return": 0.1279,
+      "ann_return": 0.1359,
+      "ann_vol": 0.1783,
+      "sharpe": 0.762,
+      "t_stat": 0.763,
+      "max_drawdown": 0.1676
+    },
+    "2025H1": {
+      "days": 180,
+      "total_return": -0.0333,
+      "ann_return": -0.0582,
+      "ann_vol": 0.1456,
+      "sharpe": -0.4,
+      "t_stat": -0.281,
+      "max_drawdown": 0.096
+    }
+  },
+  "buy_and_hold": {
+    "days": 1975,
+    "total_return": 0.1034,
+    "ann_return": 0.4642,
+    "ann_vol": 0.9343,
+    "sharpe": 0.497,
+    "t_stat": 1.156,
+    "max_drawdown": 0.9145,
+    "avg_gross_exposure": 1.0,
+    "avg_positions": 19.78,
+    "avg_daily_turnover": 0.0359,
+    "funding_drag_ann": 0.0681,
+    "forced_exits_while_held": 4,
+    "funding_fallback_position_days": 105
+  },
+  "buy_and_hold_by_year": {
+    "2020": {
+      "days": 334,
+      "total_return": 0.4043,
+      "ann_return": 0.8827,
+      "ann_vol": 0.9696,
+      "sharpe": 0.91,
+      "t_stat": 0.871,
+      "max_drawdown": 0.65
+    },
+    "2021": {
+      "days": 365,
+      "total_return": 3.3866,
+      "ann_return": 2.1335,
+      "ann_vol": 1.1346,
+      "sharpe": 1.88,
+      "t_stat": 1.88,
+      "max_drawdown": 0.6372
+    },
+    "2022": {
+      "days": 365,
+      "total_return": -0.8341,
+      "ann_return": -1.3069,
+      "ann_vol": 0.9761,
+      "sharpe": -1.339,
+      "t_stat": -1.339,
+      "max_drawdown": 0.8422
+    },
+    "2023": {
+      "days": 365,
+      "total_return": 0.7847,
+      "ann_return": 0.7831,
+      "ann_vol": 0.6378,
+      "sharpe": 1.228,
+      "t_stat": 1.228,
+      "max_drawdown": 0.4659
+    },
+    "2024": {
+      "days": 366,
+      "total_return": -0.0293,
+      "ann_return": 0.3187,
+      "ann_vol": 0.8363,
+      "sharpe": 0.381,
+      "t_stat": 0.382,
+      "max_drawdown": 0.5505
+    },
+    "2025H1": {
+      "days": 180,
+      "total_return": -0.3768,
+      "ann_return": -0.4569,
+      "ann_vol": 1.0159,
+      "sharpe": -0.45,
+      "t_stat": -0.316,
+      "max_drawdown": 0.6694
+    }
+  },
+  "psr_sharpe_above_0": 0.9786,
+  "dsr_after_5_trials": 0.8785,
+  "per_obs_sharpe_of_trials": [
+    0.02952,
+    0.05834,
+    0.06724,
+    0.04603
+  ],
+  "criteria": {
+    "Sharpe >= 0.8": true,
+    "t-stat >= 2.0": true,
+    "Sharpe >= buy-and-hold (same universe)": true,
+    "max drawdown <= 30%": true,
+    "2022 loss <= half of buy-and-hold loss": true,
+    "DSR after 5 trials >= 0.95": false
+  },
+  "decision": "REJECTED",
+  "diagnostic_fixed20_same_simulator": {
+    "H-003 window (published Sharpe 1.284)": {
+      "days": 1063,
+      "total_return": 1.0846,
+      "ann_return": 0.2765,
+      "ann_vol": 0.2195,
+      "sharpe": 1.26,
+      "t_stat": 2.15,
+      "max_drawdown": 0.236,
+      "avg_gross_exposure": 0.222,
+      "avg_positions": 8.71,
+      "avg_daily_turnover": 0.0446,
+      "funding_drag_ann": 0.0627,
+      "forced_exits_while_held": 0,
+      "funding_fallback_position_days": 0
+    },
+    "H-002 development window (published Sharpe 1.114)": {
+      "days": 879,
+      "total_return": 0.6838,
+      "ann_return": 0.2392,
+      "ann_vol": 0.2144,
+      "sharpe": 1.116,
+      "t_stat": 1.732,
+      "max_drawdown": 0.209,
+      "avg_gross_exposure": 0.303,
+      "avg_positions": 9.75,
+      "avg_daily_turnover": 0.0624,
+      "funding_drag_ann": 0.0293,
+      "forced_exits_while_held": 0,
+      "funding_fallback_position_days": 0
+    },
+    "full period": {
+      "days": 1975,
+      "total_return": 3.0456,
+      "ann_return": 0.2826,
+      "ann_vol": 0.22,
+      "sharpe": 1.284,
+      "t_stat": 2.987,
+      "max_drawdown": 0.236,
+      "avg_gross_exposure": 0.262,
+      "avg_positions": 9.26,
+      "avg_daily_turnover": 0.0528,
+      "funding_drag_ann": 0.0475,
+      "forced_exits_while_held": 0,
+      "funding_fallback_position_days": 0
+    }
+  }
+}
