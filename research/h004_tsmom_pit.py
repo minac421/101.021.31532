@@ -60,16 +60,22 @@ def _ms(raw: str) -> int:
 
 
 def daily_bars(root: Path, symbol: str) -> dict[int, tuple[float, float, float]]:
-    """day -> (open, close, quote volume) from the archive's 1d klines, registered range only."""
+    """day -> (open, close, quote volume) from the archive's 1d klines, registered range only.
+
+    Monthly files first; official daily files fill the days some monthly files are missing.
+    Zero-volume bars are dropped (no trade happened, so the day is not tradable)."""
     out: dict[int, tuple[float, float, float]] = {}
-    for path in sorted((root / f"data/futures/um/monthly/klines/{symbol}/1d").glob("*.zip")):
-        with zipfile.ZipFile(path) as z:
-            text = z.read(z.namelist()[0]).decode()
-        for rec in csv.reader(io.StringIO(text)):
-            if rec and rec[0].isdigit():
-                day = _ms(rec[0]) // DAY_MS
-                if DATA_START_DAY <= day < PIT_END_DAY:
-                    out[day] = (float(rec[1]), float(rec[4]), float(rec[7]))
+    for frequency in ("monthly", "daily"):
+        for path in sorted((root / f"data/futures/um/{frequency}/klines/{symbol}/1d").glob("*.zip")):
+            with zipfile.ZipFile(path) as z:
+                text = z.read(z.namelist()[0]).decode()
+            for rec in csv.reader(io.StringIO(text)):
+                if rec and rec[0].isdigit():
+                    day = _ms(rec[0]) // DAY_MS
+                    # a bar counts only if something traded: after a delisting the archive keeps
+                    # flat zero-volume bars (SRMUSDT: 560 days), which must not look tradable
+                    if DATA_START_DAY <= day < PIT_END_DAY and day not in out and float(rec[7]) > 0:
+                        out[day] = (float(rec[1]), float(rec[4]), float(rec[7]))
     return out
 
 

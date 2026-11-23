@@ -107,3 +107,30 @@ def test_baseline_holds_the_whole_universe_equally() -> None:
     sim = _run(p, variant="baseline")
     assert np.allclose(sim["gross"][sim["n"] > 0], 1.0)
     assert sim["n"].max() == 3
+
+
+def _write_kline_zip(path: Path, rows: list[tuple[str, float, float, float]]) -> None:
+    import zipfile
+    from datetime import UTC, datetime
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lines = ["open_time,open,high,low,close,volume,close_time,quote_volume,count,tbv,tbqv,ignore"]
+    for iso, o, c, qv in rows:
+        t = int(datetime.fromisoformat(iso).replace(tzinfo=UTC).timestamp() * 1000)
+        lines.append(f"{t},{o},{o},{c},{c},1,{t + 86_399_999},{qv},1,0,0,0")
+    with zipfile.ZipFile(path, "w") as z:
+        z.writestr(path.with_suffix(".csv").name, "\n".join(lines))
+
+
+def test_daily_files_fill_monthly_gaps_and_zero_volume_bars_are_not_tradable(tmp_path: Path) -> None:
+    base = tmp_path / "data/futures/um"
+    _write_kline_zip(  # the monthly file is truncated and ends with a phantom zero-volume bar
+        base / "monthly/klines/XUSDT/1d/XUSDT-1d-2022-02.zip",
+        [("2022-02-24", 10.0, 11.0, 5e6), ("2022-02-25", 11.0, 12.0, 4e6), ("2022-03-01", 12.0, 12.0, 0.0)],
+    )
+    _write_kline_zip(
+        base / "daily/klines/XUSDT/1d/XUSDT-1d-2022-02-26.zip", [("2022-02-26", 12.0, 13.0, 3e6)]
+    )
+    bars = h4.daily_bars(tmp_path, "XUSDT")
+    assert sorted(bars) == [H._day("2022-02-24"), H._day("2022-02-25"), H._day("2022-02-26")]
+    assert bars[H._day("2022-02-26")] == (12.0, 13.0, 3e6)
