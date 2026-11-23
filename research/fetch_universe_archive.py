@@ -51,6 +51,21 @@ def is_candidate(symbol: str) -> bool:
     return symbol.endswith("USDT") and "_" not in symbol and symbol[: -len("USDT")] not in PEGGED_BASES
 
 
+async def _get_with_retry(client: httpx.AsyncClient, url: str, attempts: int = 5) -> httpx.Response:
+    """GET with exponential backoff on transport errors and 5xx (listing calls are idempotent)."""
+    for attempt in range(attempts):
+        try:
+            resp = await client.get(url)
+            if resp.status_code < 500:
+                resp.raise_for_status()
+                return resp
+        except httpx.TransportError:
+            if attempt == attempts - 1:
+                raise
+        await asyncio.sleep(2**attempt)
+    raise RuntimeError(f"listing failed after {attempts} attempts: {url}")
+
+
 async def _list(client: httpx.AsyncClient, prefix: str, delimiter: bool) -> list[str]:
     """All keys (or common prefixes when delimiter=True) under prefix, following pagination."""
     out: list[str] = []
@@ -61,8 +76,7 @@ async def _list(client: httpx.AsyncClient, prefix: str, delimiter: bool) -> list
             query["delimiter"] = "/"
         if marker:
             query["marker"] = marker
-        resp = await client.get(f"{LISTING_URL}?{urllib.parse.urlencode(query)}")
-        resp.raise_for_status()
+        resp = await _get_with_retry(client, f"{LISTING_URL}?{urllib.parse.urlencode(query)}")
         xml = resp.text
         tag = "Prefix" if delimiter else "Key"
         found = re.findall(rf"<{tag}>([^<]+)</{tag}>", xml)
