@@ -59,7 +59,7 @@ def _ms(raw: str) -> int:
     return t // 1000 if t > 10**14 else t  # tolerate microsecond timestamps
 
 
-def daily_bars(root: Path, symbol: str) -> dict[int, tuple[float, float, float]]:
+def daily_bars(root: Path, symbol: str, end_day: int = PIT_END_DAY) -> dict[int, tuple[float, float, float]]:
     """day -> (open, close, quote volume) from the archive's 1d klines, registered range only.
 
     Monthly files first; official daily files fill the days some monthly files are missing.
@@ -74,12 +74,16 @@ def daily_bars(root: Path, symbol: str) -> dict[int, tuple[float, float, float]]
                     day = _ms(rec[0]) // DAY_MS
                     # a bar counts only if something traded: after a delisting the archive keeps
                     # flat zero-volume bars (SRMUSDT: 560 days), which must not look tradable
-                    if DATA_START_DAY <= day < PIT_END_DAY and day not in out and float(rec[7]) > 0:
+                    if (
+                        DATA_START_DAY <= day < min(end_day, H.LOCKBOX_DAY)
+                        and day not in out
+                        and float(rec[7]) > 0
+                    ):
                         out[day] = (float(rec[1]), float(rec[4]), float(rec[7]))
     return out
 
 
-def funding_records(root: Path, symbol: str) -> dict[int, float]:
+def funding_records(root: Path, symbol: str, end_day: int = PIT_END_DAY) -> dict[int, float]:
     """holding day -> summed funding rate in (open, next open], registered range only."""
     out: dict[int, float] = {}
     for path in sorted((root / f"data/futures/um/monthly/fundingRate/{symbol}").glob("*.zip")):
@@ -88,7 +92,7 @@ def funding_records(root: Path, symbol: str) -> dict[int, float]:
         for rec in csv.reader(io.StringIO(text)):
             if rec and rec[0].isdigit():
                 holding_day = (_ms(rec[0]) - 1) // DAY_MS
-                if DATA_START_DAY <= holding_day < PIT_END_DAY:
+                if DATA_START_DAY <= holding_day < min(end_day, H.LOCKBOX_DAY):
                     out[holding_day] = out.get(holding_day, 0.0) + float(rec[2])
     return out
 
@@ -166,10 +170,12 @@ def simulate(
     return out
 
 
-def build_panel(root: Path) -> tuple[list[str], np.ndarray, dict[str, np.ndarray]]:
+def build_panel(
+    root: Path, end_day: int = PIT_END_DAY
+) -> tuple[list[str], np.ndarray, dict[str, np.ndarray]]:
     base = root / "data/futures/um/monthly/klines"
     symbols = sorted(p.name for p in base.iterdir() if is_candidate(p.name) and (p / "1d").is_dir())
-    bars = {s: b for s in symbols if (b := daily_bars(root, s))}
+    bars = {s: b for s in symbols if (b := daily_bars(root, s, end_day))}
     symbols = sorted(bars)
     days = np.arange(min(min(b) for b in bars.values()), max(max(b) for b in bars.values()) + 1)
     index = {int(d): i for i, d in enumerate(days)}
@@ -183,7 +189,7 @@ def build_panel(root: Path) -> tuple[list[str], np.ndarray, dict[str, np.ndarray
 
 
 def add_funding(
-    root: Path, symbols: list[str], days: np.ndarray, needed: np.ndarray
+    root: Path, symbols: list[str], days: np.ndarray, needed: np.ndarray, end_day: int = PIT_END_DAY
 ) -> tuple[np.ndarray, np.ndarray]:
     funding = np.zeros((len(days), len(symbols)))
     has = np.zeros((len(days), len(symbols)), dtype=bool)
@@ -191,7 +197,7 @@ def add_funding(
     for j, s in enumerate(symbols):
         if not needed[j]:
             continue
-        for d, rate in funding_records(root, s).items():
+        for d, rate in funding_records(root, s, end_day).items():
             if d in index:
                 funding[index[d], j], has[index[d], j] = rate, True
     return funding, has
