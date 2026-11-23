@@ -7,9 +7,10 @@ Since 2026 the USD-M market WebSocket is split into routed paths
 * ``/market`` — regular market data (aggTrade, markPrice, kline, ...);
 * ``/private`` — user data (listenKey).
 
-The routing table below is a *default*; only the entries marked "verified" were
-confirmed during design. Everything is overridable from configuration and must
-be re-checked against the official routing table in Phase 0.
+The routing table below was verified against Binance's official Python SDK
+(binance-connector-python, websocket_streams/streams/public_api.py and
+market_api.py, 2026-11) and agrees with NautilusTrader's adapter. It stays
+overridable from configuration in case Binance changes it again.
 
 Connection limits: at most 200 streams per connection (we default to 150 for
 headroom) and 10 incoming messages per second per connection. Streams are put in
@@ -41,10 +42,10 @@ DEFAULT_ROUTES: Mapping[str, Route] = {
     "markPrice": Route.MARKET,  # verified
     "kline": Route.MARKET,  # verified
     "continuousKline": Route.MARKET,
-    "forceOrder": Route.MARKET,  # TO VERIFY in Phase 0
-    "ticker": Route.MARKET,  # TO VERIFY in Phase 0
-    "miniTicker": Route.MARKET,  # TO VERIFY in Phase 0
-    "contractInfo": Route.MARKET,  # TO VERIFY in Phase 0
+    "forceOrder": Route.MARKET,  # verified
+    "ticker": Route.MARKET,  # verified
+    "miniTicker": Route.MARKET,  # verified
+    "contractInfo": Route.MARKET,  # verified
 }
 
 _KIND_RE = re.compile(r"^(?:!|[a-z0-9_]+@)([A-Za-z]+)")

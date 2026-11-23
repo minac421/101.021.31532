@@ -57,7 +57,8 @@
 | مسجّل بيانات السوق (Binance USD-M، للقراءة فقط) | [`services/collector`](services/collector/README.md) | جاهز للتشغيل؛ مُختبر مقابل منصة مزيفة تحاكي البروتوكول والتوجيه |
 | مكتبات طبقة البيانات: الدفتر المحلي، المسجّل الخام، الجودة، REST، WebSocket، الأرشيف | [`packages/wt_data`](packages/wt_data) | 80 اختباراً (وحدة، خصائص، تكامل) |
 | تنزيل الأرشيف التاريخي المجاني بتحقق SHA256 | `wt-collector backfill` | جُرّب فعلياً: 1,720 ملفاً لعشرين رمزاً |
-| البحث: أول فرضية مسجلة مسبقاً | [سجل البحث](docs/research/README.md) | H-001 **مرفوضة**: لا ميزة بعد التكاليف — وهذا ما يحمي رأس المال |
+| تقييم صارم للمستودعات مفتوحة المصدر + أدوات التحقق الإحصائي (CPCV، DSR، PBO) | [التقييم](docs/research/repo-due-diligence-2026-11.md) | 18 مرشحاً فُحصت مباشرة؛ purgedcv معتمدة باختبارات تحقق مستقلة |
+| البحث: فرضيات مسجلة مسبقاً | [سجل البحث](docs/research/README.md) | H-001 **مرفوضة**: لا ميزة بعد التكاليف — وهذا ما يحمي رأس المال |
 | الحزم والأدوات: uv workspace، ruff، mypy strict، import-linter | [`pyproject.toml`](pyproject.toml) | مفروضة في CI |
 | CI: الاختبارات + حوكمة PostgreSQL + مخطط ClickHouse + روابط الوثائق | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) | — |
 | الحاويات والمراقبة (المسجّل + Prometheus وقواعد تنبيه صحة البيانات) | [`infra/`](infra/docker-compose.yml) | `docker compose config` صالح |

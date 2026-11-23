@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: pip install uv==0.11.32
-      - run: uv sync --frozen --python ${{ matrix.python }}
+      - run: uv sync --frozen --group research --python ${{ matrix.python }}
       - name: Lint and format
         run: |
           uv run ruff check .

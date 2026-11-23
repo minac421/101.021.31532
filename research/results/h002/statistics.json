@@ -1,0 +1,24 @@
+{
+  "n_trials": 3,
+  "var_sharpe_per_obs_across_h002_variants": 0.00041523083272009513,
+  "H-002a": {
+    "days": 880,
+    "sharpe_annualised": 0.564,
+    "skew": 0.385,
+    "kurtosis": 7.171,
+    "psr_sharpe_above_0": 0.8104,
+    "dsr_after_3_trials": 0.6412,
+    "min_track_record_days_95pct": 3076,
+    "min_track_record_years_95pct": 8.43
+  },
+  "H-002b": {
+    "days": 880,
+    "sharpe_annualised": 1.114,
+    "skew": 0.811,
+    "kurtosis": 10.815,
+    "psr_sharpe_above_0": 0.9612,
+    "dsr_after_3_trials": 0.8923,
+    "min_track_record_days_95pct": 766,
+    "min_track_record_years_95pct": 2.1
+  }
+}

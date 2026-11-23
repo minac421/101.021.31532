@@ -12,7 +12,9 @@
 
 ## 2. Binance USDⓈ-M — WebSocket
 
-**تأكيد مستقل للتوجيه:** موصل NautilusTrader 1.231.0 يرسل الدفاتر وbookTicker إلى `/public`، والصفقات وسعر العلامة والإحصاءات والشموع إلى `/market` ([SPIKE-001](spikes/SPIKE-001-trading-kernel.md)) — مطابق للجدول أدناه. ما يزال مسار `forceOrder` و`miniTicker` و`contractInfo` بحاجة إلى تحقق.
+**تأكيد مستقل للتوجيه:** موصل NautilusTrader 1.231.0 يرسل الدفاتر وbookTicker إلى `/public`، والصفقات وسعر العلامة والإحصاءات والشموع إلى `/market` ([SPIKE-001](spikes/SPIKE-001-trading-kernel.md)) — مطابق للجدول أدناه. و**كود Binance الرسمي** (binance-connector-python) يؤكد الجدول **بالكامل**، بما فيه `forceOrder` و`miniTicker` و`ticker` و`contractInfo` على `/market` ([تقييم المستودعات](research/repo-due-diligence-2026-11.md#ما-حسمه-كود-binance-الرسمي-كان-معلقا)).
+
+> **تغيير قادم (CM migration):** بث السوق الكامل (`!bookTicker`، `!forceOrder@arr`، `!miniTicker@arr`، `!ticker@arr`) سيحمل عقود USD-M وCOIN-M معاً مع حقل `st` (`1` = USD-M، `2` = COIN-M)، ويُضاف `st` إلى aggTrade. التسجيل الخام لا يتأثر؛ **التحليل يرشّح `st = 1`**.
 
 **حدود الاتصال** (حسب الوثائق الرسمية؛ تُعاد مطابقتها): حتى **200 بث لكل اتصال**، و**10 رسائل واردة في الثانية** لكل اتصال (اشتراك/إلغاء/ping)، وصلاحية الاتصال 24 ساعة.
 
@@ -24,9 +26,9 @@
 | `<symbol>@aggTrade` | `/market` | الصفقات المجمّعة | CVD، البصمات، بناء الشموع محلياً | لكل الرموز المؤهلة |
 | `<symbol>@kline_1m` | `/market` | الشموع الرسمية | تحقق متقاطع من الشموع المبنية محلياً | — |
 | `!markPrice@arr@1s` | `/market` | سعر العلامة والمؤشر ومعدل التمويل الحالي ووقت التمويل التالي لكل الرموز | التمويل، العلاوة/الأساس، حساب التصفية | بث واحد لكل السوق |
-| `!forceOrder@arr` | حسب جدول التوجيه | أوامر التصفية | شدة التصفيات | **عيّنة**: حد أقصى 1 لكل رمز/ثانية |
-| `!ticker@arr` / `!miniTicker@arr` | حسب جدول التوجيه | إحصاءات 24 ساعة | الماسح، التصنيف حسب السيولة | — |
-| `!contractInfo` | حسب جدول التوجيه | تغييرات العقود (الحالة، الشرائح…) | تحديث الكون فوراً | — |
+| `!forceOrder@arr` | `/market` | أوامر التصفية | شدة التصفيات | **عيّنة**: حد أقصى 1 لكل رمز/ثانية |
+| `!ticker@arr` / `!miniTicker@arr` | `/market` | إحصاءات 24 ساعة | الماسح، التصنيف حسب السيولة | — |
+| `!contractInfo` | `/market` | تغييرات العقود (الحالة، الشرائح…) | تحديث الكون فوراً | — |
 | User Data Stream (`listenKey`) | `/private` | `ORDER_TRADE_UPDATE`، `ACCOUNT_UPDATE`، `ALGO_UPDATE`، `MARGIN_CALL` … | حالة الحساب والأوامر والإيقافات | **أعلى أولوية؛ لا يُسقط أبداً تحت الضغط** |
 
 **خطة الاتصالات** (N = عدد الرموز المؤهلة؛ نترك هامشاً ونستخدم ≤150 بثاً للاتصال):
@@ -35,7 +37,7 @@
 |---|---|---|
 | `aggTrade` لكل الرموز | `/market` | ⌈N/150⌉ |
 | `kline_1m` لكل الرموز | `/market` | ⌈N/150⌉ |
-| المصفوفات العامة (`!markPrice@arr@1s`، `!forceOrder@arr`، `!ticker@arr`، `!contractInfo`) | حسب التوجيه | 1–2 |
+| المصفوفات العامة (`!markPrice@arr@1s`، `!forceOrder@arr`، `!ticker@arr`، `!contractInfo`) | `/market` | 1 |
 | `depth@500ms` لكل الرموز | `/public` | ⌈N/150⌉ |
 | `depth@100ms` + `bookTicker` للمرشحين (≤ 50 رمزاً) | `/public` | 1 |
 | User Data | `/private` | 1 (للمتداول) |
