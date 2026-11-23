@@ -76,12 +76,17 @@ async def _list(client: httpx.AsyncClient, prefix: str, delimiter: bool) -> list
 
 
 async def plan(
-    dataset: str, interval: str | None, start: str, end: str, concurrency: int
+    dataset: str,
+    interval: str | None,
+    start: str,
+    end: str,
+    concurrency: int,
+    only: set[str] | None = None,
 ) -> list[ArchiveFile]:
     base = f"data/futures/um/monthly/{dataset}/"
     async with httpx.AsyncClient(timeout=60.0) as client:
         listed = (p.rstrip("/").split("/")[-1] for p in await _list(client, base, True))
-        symbols = sorted(s for s in listed if is_candidate(s))
+        symbols = sorted(s for s in listed if is_candidate(s) and (only is None or s in only))
         semaphore = asyncio.Semaphore(concurrency)
 
         async def months_of(symbol: str) -> list[str]:
@@ -103,10 +108,10 @@ def _month(key: str) -> str | None:
     return m.group(1) if m else None
 
 
-def monthly_days(root: Path, symbol: str) -> set[date]:
-    """Days that have a bar in the local monthly 1d files of symbol."""
+def monthly_days(root: Path, symbol: str, interval: str = "1d") -> set[date]:
+    """Days that have at least one bar in the local monthly kline files of symbol."""
     out: set[date] = set()
-    for path in sorted((root / f"data/futures/um/monthly/klines/{symbol}/1d").glob("*.zip")):
+    for path in sorted((root / f"data/futures/um/monthly/klines/{symbol}/{interval}").glob("*.zip")):
         with zipfile.ZipFile(path) as z:
             text = z.read(z.namelist()[0]).decode()
         for rec in csv.reader(io.StringIO(text)):
@@ -116,8 +121,15 @@ def monthly_days(root: Path, symbol: str) -> set[date]:
     return out
 
 
-async def fill_daily_gaps(root: Path, start: str, end: str, concurrency: int) -> list[FetchResult]:
-    """Fetch daily 1d files for internal gaps and for days after the last monthly bar (until a 404)."""
+async def fill_daily_gaps(
+    root: Path,
+    start: str,
+    end: str,
+    concurrency: int,
+    interval: str = "1d",
+    only: set[str] | None = None,
+) -> list[FetchResult]:
+    """Fetch daily kline files for internal gaps and for days after the last monthly bar (until a 404)."""
     first_day = date.fromisoformat(f"{start}-01")
     year, month = (int(x) for x in end.split("-"))
     stop = date(year + month // 12, month % 12 + 1, 1)  # first day after the last fetched month
@@ -127,30 +139,34 @@ async def fill_daily_gaps(root: Path, start: str, end: str, concurrency: int) ->
     async with httpx.AsyncClient(base_url=ARCHIVE_BASE_URL, timeout=60.0) as client:
 
         async def one(symbol: str) -> None:
-            have = {d for d in monthly_days(root, symbol) if first_day <= d < stop}
+            have = {d for d in monthly_days(root, symbol, interval) if first_day <= d < stop}
             if not have:
                 return
             lo, hi = min(have), max(have)
             missing = [lo + timedelta(days=k) for k in range((hi - lo).days + 1)]
             for day in (d for d in missing if d not in have):
                 async with semaphore:
-                    results.append(await fetch_file(client, _daily(symbol, day), root))
+                    results.append(await fetch_file(client, _daily(symbol, day, interval), root))
             day = hi + timedelta(days=1)
             while day < stop:  # a truncated last month looks like a delisting: probe until the first 404
                 async with semaphore:
-                    result = await fetch_file(client, _daily(symbol, day), root)
+                    result = await fetch_file(client, _daily(symbol, day, interval), root)
                 results.append(result)
                 if result.status not in (FetchStatus.DOWNLOADED, FetchStatus.EXISTS):
                     break
                 day += timedelta(days=1)
 
-        symbols = sorted(p.name for p in base.iterdir() if is_candidate(p.name) and (p / "1d").is_dir())
+        symbols = sorted(
+            p.name
+            for p in base.iterdir()
+            if is_candidate(p.name) and (p / interval).is_dir() and (only is None or p.name in only)
+        )
         await asyncio.gather(*(one(s) for s in symbols))
     return results
 
 
-def _daily(symbol: str, day: date) -> ArchiveFile:
-    return ArchiveFile("klines", symbol, day.isoformat(), frequency="daily", interval="1d")
+def _daily(symbol: str, day: date, interval: str) -> ArchiveFile:
+    return ArchiveFile("klines", symbol, day.isoformat(), frequency="daily", interval=interval)
 
 
 def _summary(results: list[FetchResult]) -> dict[str, object]:
@@ -174,7 +190,10 @@ def main() -> int:
     ap.add_argument("--end", required=True, help="last month to fetch, e.g. 2025-06")
     ap.add_argument("--concurrency", type=int, default=16)
     ap.add_argument("--steps", default=",".join(STEPS), help=f"comma-separated subset of {STEPS}")
+    ap.add_argument("--interval", default="1d", help="kline interval for the kline steps")
+    ap.add_argument("--symbols-file", type=Path, help="restrict to these symbols (one per line)")
     args = ap.parse_args()
+    only = set(args.symbols_file.read_text().split()) if args.symbols_file else None
     if args.end >= LOCKBOX_MONTH:
         raise SystemExit(f"refusing to fetch lockbox data ({LOCKBOX_MONTH} onwards)")
     steps = args.steps.split(",")
@@ -185,10 +204,14 @@ def main() -> int:
         if step not in steps:
             continue
         if step == "daily-gaps":
-            results = asyncio.run(fill_daily_gaps(args.archive, args.start, args.end, args.concurrency))
+            results = asyncio.run(
+                fill_daily_gaps(args.archive, args.start, args.end, args.concurrency, args.interval, only)
+            )
         else:
-            dataset, interval = ("klines", "1d") if step == "monthly-klines" else ("fundingRate", None)
-            files = asyncio.run(plan(dataset, interval, args.start, args.end, args.concurrency))
+            dataset, interval = (
+                ("klines", args.interval) if step == "monthly-klines" else ("fundingRate", None)
+            )
+            files = asyncio.run(plan(dataset, interval, args.start, args.end, args.concurrency, only))
             results = asyncio.run(fetch_all(files, args.archive, concurrency=args.concurrency))
         summary[step] = _summary(results)
     print(json.dumps(summary, indent=2))
