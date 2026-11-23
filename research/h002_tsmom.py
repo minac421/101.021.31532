@@ -37,13 +37,16 @@ def _day(iso: str) -> int:
 DEV = (_day("2023-01-01"), _day("2025-07-01"))
 VAL = (_day("2025-07-01"), _day("2026-08-01"))
 LOCKBOX_DAY = _day("2026-08-01")
+DATA_START_DAY = _day("2023-01-01")  # H-002 was registered on data from 2023-01-01
 YEARS = {"2023": (_day("2023-01-01"), _day("2024-01-01")), "2024": (_day("2024-01-01"), _day("2025-01-01")),
          "2025H1": (_day("2025-01-01"), _day("2025-07-01"))}  # fmt: skip
 
 LOOKBACK, VOL_N, TARGET_VOL, MAX_W, GROSS_CAP, COST = 28, 30, 0.40, 2.0, 2.0, 0.0007
 
 
-def daily_bars(root: Path, symbol: str) -> dict[int, tuple[float, float]]:
+def daily_bars(
+    root: Path, symbol: str, start_day: int = DATA_START_DAY, end_day: int = LOCKBOX_DAY
+) -> dict[int, tuple[float, float]]:
     """day -> (open, close) from 15m klines; days with fewer than 90 bars are dropped."""
     per_day: dict[int, list[tuple[int, float, float]]] = {}
     for path in sorted((root / f"data/futures/um/monthly/klines/{symbol}/15m").glob("*.zip")):
@@ -52,7 +55,7 @@ def daily_bars(root: Path, symbol: str) -> dict[int, tuple[float, float]]:
         for rec in csv.reader(io.StringIO(text)):
             if rec and rec[0].isdigit():
                 day = int(rec[0]) // DAY_MS
-                if day < LOCKBOX_DAY:
+                if start_day <= day < min(end_day, LOCKBOX_DAY):  # registered range only
                     per_day.setdefault(day, []).append((int(rec[0]), float(rec[1]), float(rec[4])))
     out = {}
     for day, bars in per_day.items():
@@ -62,7 +65,9 @@ def daily_bars(root: Path, symbol: str) -> dict[int, tuple[float, float]]:
     return out
 
 
-def funding_by_holding_day(root: Path, symbol: str) -> dict[int, float]:
+def funding_by_holding_day(
+    root: Path, symbol: str, start_day: int = DATA_START_DAY, end_day: int = LOCKBOX_DAY
+) -> dict[int, float]:
     """Sum of funding rates charged while holding from open(day) to open(day+1), i.e. in (open, next open]."""
     out: dict[int, float] = {}
     for path in sorted((root / f"data/futures/um/monthly/fundingRate/{symbol}").glob("*.zip")):
@@ -72,13 +77,19 @@ def funding_by_holding_day(root: Path, symbol: str) -> dict[int, float]:
             if rec and rec[0].isdigit():
                 t = int(rec[0])
                 holding_day = (t - 1) // DAY_MS  # (open, next open] window
-                out[holding_day] = out.get(holding_day, 0.0) + float(rec[2])
+                if start_day <= holding_day < min(end_day, LOCKBOX_DAY):
+                    out[holding_day] = out.get(holding_day, 0.0) + float(rec[2])
     return out
 
 
-def build_panel(root: Path) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    bars = {s: daily_bars(root, s) for s in SYMBOLS}
-    fund = {s: funding_by_holding_day(root, s) for s in SYMBOLS}
+def build_panel(
+    root: Path, start_day: int = DATA_START_DAY, end_day: int = LOCKBOX_DAY
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    bars = {s: daily_bars(root, s, start_day, end_day) for s in SYMBOLS}
+    fund = {s: funding_by_holding_day(root, s, start_day, end_day) for s in SYMBOLS}
+    bars = {s: b for s, b in bars.items() if b}  # symbols with no data in range are skipped
+    if not bars:
+        raise SystemExit("no data in the requested range")
     first = min(min(b) for b in bars.values())
     last = max(max(b) for b in bars.values())
     days = np.arange(first, last + 1)
@@ -86,7 +97,7 @@ def build_panel(root: Path) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndar
     opens, closes, funding = np.full(shape, np.nan), np.full(shape, np.nan), np.zeros(shape)
     for j, s in enumerate(SYMBOLS):
         for i, d in enumerate(days):
-            if d in bars[s]:
+            if d in bars.get(s, {}):
                 opens[i, j], closes[i, j] = bars[s][d]
             funding[i, j] = fund[s].get(int(d), 0.0)
     return days, opens, closes, funding

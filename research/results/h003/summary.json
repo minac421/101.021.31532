@@ -1,0 +1,106 @@
+{
+  "hypothesis": "H-003",
+  "period": "2020-01-01 -> 2022-12-31 (after 31-day warm-up)",
+  "symbols_with_data_first_day": 3,
+  "strategy": {
+    "days": 1063,
+    "total_return": 1.1176,
+    "ann_return": 0.2819,
+    "ann_vol": 0.2195,
+    "sharpe": 1.284,
+    "t_stat": 2.191,
+    "max_drawdown": 0.2305
+  },
+  "strategy_by_year": {
+    "2020": {
+      "days": 334,
+      "total_return": 0.369,
+      "ann_return": 0.375,
+      "ann_vol": 0.2515,
+      "sharpe": 1.491,
+      "t_stat": 1.427,
+      "max_drawdown": 0.1601
+    },
+    "2021": {
+      "days": 365,
+      "total_return": 0.8631,
+      "ann_return": 0.6489,
+      "ann_vol": 0.2281,
+      "sharpe": 2.844,
+      "t_stat": 2.844,
+      "max_drawdown": 0.1273
+    },
+    "2022": {
+      "days": 364,
+      "total_return": -0.1698,
+      "ann_return": -0.1715,
+      "ann_vol": 0.1728,
+      "sharpe": -0.993,
+      "t_stat": -0.991,
+      "max_drawdown": 0.1927
+    }
+  },
+  "buy_and_hold": {
+    "days": 1063,
+    "total_return": 1.8392,
+    "ann_return": 0.833,
+    "ann_vol": 0.955,
+    "sharpe": 0.872,
+    "t_stat": 1.488,
+    "max_drawdown": 0.7952
+  },
+  "buy_and_hold_by_year": {
+    "2020": {
+      "days": 334,
+      "total_return": 0.5793,
+      "ann_return": 0.9644,
+      "ann_vol": 0.9221,
+      "sharpe": 1.046,
+      "t_stat": 1.0,
+      "max_drawdown": 0.6472
+    },
+    "2021": {
+      "days": 365,
+      "total_return": 5.1484,
+      "ann_return": 2.4153,
+      "ann_vol": 1.0811,
+      "sharpe": 2.234,
+      "t_stat": 2.234,
+      "max_drawdown": 0.6308
+    },
+    "2022": {
+      "days": 364,
+      "total_return": -0.7076,
+      "ann_return": -0.8743,
+      "ann_vol": 0.8376,
+      "sharpe": -1.044,
+      "t_stat": -1.042,
+      "max_drawdown": 0.7217
+    }
+  },
+  "avg_gross_exposure": 0.222,
+  "avg_daily_turnover": 0.0442,
+  "funding_drag_ann": 0.0626,
+  "criteria": {
+    "Sharpe >= 0.8": true,
+    "t-stat >= 2.0": true,
+    "Sharpe >= buy-and-hold": true,
+    "max drawdown <= 30%": true,
+    "2022 loss <= half of buy-and-hold loss": true
+  },
+  "decision": "ACCEPTED",
+  "combined_2020_2025H1": {
+    "days": 1943,
+    "metrics": {
+      "days": 1943,
+      "total_return": 2.5627,
+      "ann_return": 0.2623,
+      "ann_vol": 0.2171,
+      "sharpe": 1.208,
+      "t_stat": 2.788,
+      "max_drawdown": 0.2911
+    },
+    "psr_sharpe_above_0": 0.9972,
+    "dsr_after_4_trials": 0.9687
+  }
+}
