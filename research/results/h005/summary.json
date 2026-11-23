@@ -1,0 +1,266 @@
+{
+  "hypothesis": "H-005",
+  "period": "2020-10-01 -> 2025-06-30 (entries; exits inside the range)",
+  "coverage": {
+    "hours_with_bar": 846563,
+    "hours_with_oi": 637812,
+    "universe_hours": 846720
+  },
+  "trades": {
+    "trades": 1407,
+    "mean_net": -0.00187,
+    "t_net": -1.037,
+    "win_rate": 0.479,
+    "mean_gross": 2e-05,
+    "mean_excess_over_control": -0.00204,
+    "stops": 205,
+    "forced_exits": 1,
+    "mean_funding": -0.000101
+  },
+  "portfolio_daily": {
+    "days": 1734,
+    "total_return": -0.2858,
+    "ann_return": -0.0555,
+    "ann_vol": 0.1737,
+    "sharpe": -0.32,
+    "t_stat": -0.697,
+    "max_drawdown": 0.3676
+  },
+  "avg_open_positions": 0.372,
+  "by_period": {
+    "2020Q4+2021": {
+      "trades": 52,
+      "mean_net": -0.0173,
+      "t_net": -2.204,
+      "win_rate": 0.423,
+      "mean_gross": -0.0153,
+      "mean_excess_over_control": -0.01752,
+      "stops": 11,
+      "forced_exits": 0,
+      "mean_funding": -7e-06
+    },
+    "2022": {
+      "trades": 405,
+      "mean_net": -0.00217,
+      "t_net": -0.49,
+      "win_rate": 0.41,
+      "mean_gross": -8e-05,
+      "mean_excess_over_control": -0.00152,
+      "stops": 76,
+      "forced_exits": 1,
+      "mean_funding": 9e-05
+    },
+    "2023": {
+      "trades": 582,
+      "mean_net": 0.00247,
+      "t_net": 1.328,
+      "win_rate": 0.54,
+      "mean_gross": 0.00411,
+      "mean_excess_over_control": 0.00118,
+      "stops": 36,
+      "forced_exits": 0,
+      "mean_funding": -0.000357
+    },
+    "2024": {
+      "trades": 279,
+      "mean_net": -0.00136,
+      "t_net": -0.307,
+      "win_rate": 0.495,
+      "mean_gross": 0.00074,
+      "mean_excess_over_control": -0.00129,
+      "stops": 58,
+      "forced_exits": 0,
+      "mean_funding": 9.5e-05
+    },
+    "2025H1": {
+      "trades": 89,
+      "mean_net": -0.02152,
+      "t_net": -3.254,
+      "win_rate": 0.382,
+      "mean_gross": -0.01948,
+      "mean_excess_over_control": -0.01879,
+      "stops": 24,
+      "forced_exits": 0,
+      "mean_funding": 3.6e-05
+    }
+  },
+  "by_side": {
+    "long after crash": {
+      "trades": 1014,
+      "mean_net": 0.00233,
+      "t_net": 1.165,
+      "win_rate": 0.51,
+      "mean_gross": 0.00388,
+      "mean_excess_over_control": 0.00077,
+      "stops": 108,
+      "forced_exits": 0,
+      "mean_funding": -0.000456
+    },
+    "short after spike": {
+      "trades": 393,
+      "mean_net": -0.01273,
+      "t_net": -3.303,
+      "win_rate": 0.399,
+      "mean_gross": -0.00991,
+      "mean_excess_over_control": -0.0093,
+      "stops": 97,
+      "forced_exits": 1,
+      "mean_funding": 0.000815
+    }
+  },
+  "psr_sharpe_above_0": 0.239,
+  "dsr_after_6_trials": 0.0056,
+  "per_obs_sharpe_of_trials": [
+    0.02952,
+    0.05834,
+    0.06724,
+    0.04603,
+    -0.01673
+  ],
+  "criteria": {
+    ">= 200 trades": true,
+    "mean net per trade > 0 and t >= 2.0": false,
+    "mean excess over control >= 0.40%": false,
+    "portfolio Sharpe >= 0.8": false,
+    "max drawdown <= 30%": false,
+    "positive mean net in >= 4 of 5 periods": false,
+    "DSR after 6 trials >= 0.95": false
+  },
+  "decision": "REJECTED",
+  "diagnostic_threshold_grid": {
+    "dOI<=-2% |z|>=2": {
+      "trades": 3967,
+      "mean_net": -0.00188,
+      "t_net": -2.009,
+      "win_rate": 0.475,
+      "mean_gross": 0.00013,
+      "mean_excess_over_control": -0.00186,
+      "stops": 408,
+      "forced_exits": 1,
+      "mean_funding": 1.5e-05,
+      "sharpe": -0.595
+    },
+    "dOI<=-2% |z|>=3": {
+      "trades": 1953,
+      "mean_net": -0.00129,
+      "t_net": -0.869,
+      "win_rate": 0.479,
+      "mean_gross": 0.00074,
+      "mean_excess_over_control": -0.00102,
+      "stops": 252,
+      "forced_exits": 1,
+      "mean_funding": 2.1e-05,
+      "sharpe": -0.262
+    },
+    "dOI<=-2% |z|>=4": {
+      "trades": 1073,
+      "mean_net": -0.00236,
+      "t_net": -1.09,
+      "win_rate": 0.491,
+      "mean_gross": -0.0004,
+      "mean_excess_over_control": -0.00131,
+      "stops": 170,
+      "forced_exits": 0,
+      "mean_funding": -3.2e-05,
+      "sharpe": -0.306
+    },
+    "dOI<=-3% |z|>=2": {
+      "trades": 2480,
+      "mean_net": -0.0019,
+      "t_net": -1.503,
+      "win_rate": 0.477,
+      "mean_gross": 0.00014,
+      "mean_excess_over_control": -0.00224,
+      "stops": 301,
+      "forced_exits": 1,
+      "mean_funding": 3.7e-05,
+      "sharpe": -0.496
+    },
+    "dOI<=-3% |z|>=3": {
+      "trades": 1407,
+      "mean_net": -0.00187,
+      "t_net": -1.037,
+      "win_rate": 0.479,
+      "mean_gross": 2e-05,
+      "mean_excess_over_control": -0.00204,
+      "stops": 205,
+      "forced_exits": 1,
+      "mean_funding": -0.000101,
+      "sharpe": -0.32
+    },
+    "dOI<=-3% |z|>=4": {
+      "trades": 833,
+      "mean_net": -0.003,
+      "t_net": -1.198,
+      "win_rate": 0.49,
+      "mean_gross": -0.00108,
+      "mean_excess_over_control": -0.00226,
+      "stops": 135,
+      "forced_exits": 0,
+      "mean_funding": -8.6e-05,
+      "sharpe": -0.38
+    },
+    "dOI<=-5% |z|>=2": {
+      "trades": 1091,
+      "mean_net": -0.00427,
+      "t_net": -1.941,
+      "win_rate": 0.455,
+      "mean_gross": -0.00228,
+      "mean_excess_over_control": -0.00523,
+      "stops": 175,
+      "forced_exits": 1,
+      "mean_funding": -4e-06,
+      "sharpe": -0.653
+    },
+    "dOI<=-5% |z|>=3": {
+      "trades": 734,
+      "mean_net": -0.00279,
+      "t_net": -1.02,
+      "win_rate": 0.474,
+      "mean_gross": -0.00096,
+      "mean_excess_over_control": -0.00348,
+      "stops": 118,
+      "forced_exits": 1,
+      "mean_funding": -0.000165,
+      "sharpe": -0.347
+    },
+    "dOI<=-5% |z|>=4": {
+      "trades": 493,
+      "mean_net": -0.0036,
+      "t_net": -1.009,
+      "win_rate": 0.483,
+      "mean_gross": -0.00169,
+      "mean_excess_over_control": -0.00299,
+      "stops": 91,
+      "forced_exits": 0,
+      "mean_funding": -8.8e-05,
+      "sharpe": -0.34
+    }
+  },
+  "diagnostic_horizons": {
+    "4h": {
+      "trades": 1474,
+      "mean_net": -0.0022,
+      "t_net": -1.828,
+      "win_rate": 0.497,
+      "mean_gross": -0.00022,
+      "mean_excess_over_control": -0.00089,
+      "stops": 106,
+      "forced_exits": 1,
+      "mean_funding": -1.5e-05,
+      "sharpe": -0.576
+    },
+    "24h": {
+      "trades": 1333,
+      "mean_net": 0.0008,
+      "t_net": 0.339,
+      "win_rate": 0.486,
+      "mean_gross": 0.00273,
+      "mean_excess_over_control": -0.00127,
+      "stops": 265,
+      "forced_exits": 1,
+      "mean_funding": -7.2e-05,
+      "sharpe": 0.108
+    }
+  }
+}
