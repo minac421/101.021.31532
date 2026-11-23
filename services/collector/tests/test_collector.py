@@ -30,7 +30,8 @@ from wt_collector.config import (
     load_config,
 )
 from wt_data.binance.um.messages import ExchangeInfo, SymbolInfo, Ticker24h
-from wt_data.binance.um.rest import BinanceUmRest
+from wt_data.binance.um.rest import BinanceUmRest, RestrictedLocationError
+from wt_data.binance.um.streams import Route
 from wt_data.recorder import read_records
 
 REPO = Path(__file__).resolve().parents[3]
@@ -239,3 +240,44 @@ async def test_recovers_from_disconnects_and_reports_the_gap(tmp_path: Path, fak
     summaries = [r["payload"] for r in _records(root, "quality.summary")]
     missing = sum(v["confirmed_missing"] for s in summaries[-1:] for v in s["agg_trade_continuity"].values())
     assert missing > 0, "missed trades must be reported, not hidden"
+
+
+@pytest.mark.integration
+async def test_restricted_location_stops_immediately_with_a_clear_error(tmp_path: Path) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            451, content=b'{"code":0,"msg":"Service unavailable from a restricted location"}'
+        )
+
+    cfg = _config(tmp_path, 9)
+    collector = Collector(
+        cfg,
+        rest=BinanceUmRest(cfg.exchange.rest_base_url, transport=httpx.MockTransport(handler)),
+        instance_id="geo",
+    )
+    with pytest.raises(RestrictedLocationError):
+        await asyncio.wait_for(collector.run(asyncio.Event()), 10)
+    events = [r["payload"]["event"] for r in _records(tmp_path / "raw" / "binance-um", "control")]
+    assert "restricted_location" in events
+
+
+@pytest.mark.integration
+async def test_wrongly_routed_stream_is_reported_as_silent(tmp_path: Path, fake_exchange: Any) -> None:
+    base = _config(tmp_path, fake_exchange.port)
+    cfg = msgspec.structs.replace(
+        base,
+        exchange=msgspec.structs.replace(
+            base.exchange, routes={"bookTicker": Route.MARKET}
+        ),  # wrong on purpose
+        quality=msgspec.structs.replace(base.quality, silent_kind_warning_s=1.0),
+    )
+    rest = BinanceUmRest(cfg.exchange.rest_base_url, transport=httpx.MockTransport(fake_exchange.rest))
+    collector = Collector(cfg, rest=rest, instance_id="route")
+    await _run(collector, 2.5)
+    assert any(s.startswith("market:") and "bookTicker" in s for s in fake_exchange.rejected_streams)
+    silent = [
+        r["payload"]["kind"]
+        for r in _records(tmp_path / "raw" / "binance-um", "control")
+        if r["payload"]["event"] == "stream_kind_silent"
+    ]
+    assert silent == ["bookTicker"]

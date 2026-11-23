@@ -22,3 +22,6 @@ config/*.local.yaml
 config/risk-policy.yaml
 *.key
 *.pem
+
+# Research outputs that are reproducible from the archive
+research/results/*/*.csv

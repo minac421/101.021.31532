@@ -54,6 +54,21 @@ uv run wt-collector plan --config config/collector.local.yaml --exchange-info ex
 uv run wt-collector read data/raw/binance-um/ws.depth/date=2026-11-23/hour=14/<file>.jsonl.zst --limit 5
 ```
 
+## الأرشيف التاريخي المجاني
+
+```bash
+uv run wt-collector backfill --dataset klines --interval 15m --symbols BTCUSDT,ETHUSDT \
+    --start 2023-01 --end 2026-10 --out data/archive
+uv run wt-collector backfill --dataset metrics --frequency daily --symbols BTCUSDT \
+    --start 2026-01-01 --end 2026-11-20 --out data/archive
+```
+
+كل ملف يُكتب فقط بعد مطابقة SHA256 مع ملف `.CHECKSUM` الرسمي، والكتابة ذرّية، والتشغيل المتكرر يتخطى ما نُزّل وتحقق منه.
+
+## إذا رفضت Binance موقع الخادم
+
+إن ردّت المنصة بـ HTTP 451 (موقع غير مسموح)، يتوقف المسجّل **فوراً** برسالة واضحة ورمز خروج 3، بدل إعادة المحاولة بلا نهاية. الحل الوحيد الصحيح: خادم في ولاية قضائية مسموحة.
+
 ## المتطلبات على الخادم
 
 - **مزامنة الوقت**: `chrony` مفعّل (المسجّل يقيس الانحراف عن ساعة المنصة وينبّه فوق 250ms).

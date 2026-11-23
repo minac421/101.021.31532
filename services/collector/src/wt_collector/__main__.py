@@ -12,6 +12,7 @@ import logging
 import signal
 import ssl
 import sys
+from collections import Counter
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -19,7 +20,9 @@ import msgspec
 
 from wt_collector.app import Collector, rank_by_quote_volume, select_focus, select_universe
 from wt_collector.config import CollectorConfig, load_config
+from wt_data.binance.archive import ArchiveFile, FetchStatus, days, fetch_all, months
 from wt_data.binance.um.messages import exchange_info_decoder, tickers_decoder
+from wt_data.binance.um.rest import RestrictedLocationError
 from wt_data.binance.um.streams import build_groups, plan_connections
 from wt_data.recorder import read_records
 
@@ -43,6 +46,15 @@ def _parser() -> argparse.ArgumentParser:
         "--exchange-info", type=Path, required=True, help="saved GET /fapi/v1/exchangeInfo JSON"
     )
     plan.add_argument("--tickers", type=Path, help="saved GET /fapi/v1/ticker/24hr JSON (for focus ranking)")
+    backfill = sub.add_parser("backfill", help="download SHA256-verified files from data.binance.vision")
+    backfill.add_argument("--dataset", required=True, help="klines, fundingRate, metrics, aggTrades, ...")
+    backfill.add_argument("--interval", help="kline interval for kline-like datasets, e.g. 15m")
+    backfill.add_argument("--frequency", default="monthly", choices=["monthly", "daily"])
+    backfill.add_argument("--symbols", required=True, help="comma-separated, e.g. BTCUSDT,ETHUSDT")
+    backfill.add_argument("--start", required=True, help="YYYY-MM (monthly) or YYYY-MM-DD (daily)")
+    backfill.add_argument("--end", required=True)
+    backfill.add_argument("--out", type=Path, default=Path("data/archive"))
+    backfill.add_argument("--concurrency", type=int, default=8)
     read = sub.add_parser("read", help="print records from a recorder file (.jsonl.zst)")
     read.add_argument("path", type=Path)
     read.add_argument("--limit", type=int, default=20)
@@ -84,12 +96,37 @@ async def _run(cfg: CollectorConfig) -> int:
     for sig in (signal.SIGINT, signal.SIGTERM):
         loop.add_signal_handler(sig, stop.set)
     ssl_context = ssl.create_default_context(cafile=cfg.rest.ca_bundle) if cfg.rest.ca_bundle else None
-    await Collector(cfg, ssl_context=ssl_context).run(stop)
+    try:
+        await Collector(cfg, ssl_context=ssl_context).run(stop)
+    except RestrictedLocationError as exc:
+        print(f"fatal: {exc}", file=sys.stderr)
+        return 3
     return 0
+
+
+def _backfill(args: argparse.Namespace) -> int:
+    periods = months(args.start, args.end) if args.frequency == "monthly" else days(args.start, args.end)
+    files = [
+        ArchiveFile(
+            args.dataset, symbol.strip().upper(), period, frequency=args.frequency, interval=args.interval
+        )
+        for period in periods
+        for symbol in args.symbols.split(",")
+        if symbol.strip()
+    ]
+    results = asyncio.run(fetch_all(files, args.out, concurrency=args.concurrency))
+    counts = Counter(r.status.value for r in results)
+    print(f"{len(results)} files: " + ", ".join(f"{k}={v}" for k, v in sorted(counts.items())))
+    for r in results:
+        if r.status in (FetchStatus.CHECKSUM_MISMATCH, FetchStatus.ERROR):
+            print(f"  {r.status.value}: {r.file.path} {r.detail}", file=sys.stderr)
+    return 1 if counts.get("checksum_mismatch") or counts.get("error") else 0
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
+    if args.command == "backfill":
+        return _backfill(args)
     if args.command == "read":
         for i, record in enumerate(read_records(args.path)):
             if i >= args.limit:

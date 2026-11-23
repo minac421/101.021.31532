@@ -48,7 +48,13 @@ from wt_data.binance.um.messages import (
     server_time_decoder,
     tickers_decoder,
 )
-from wt_data.binance.um.rest import BinanceUmRest, RateLimitedError, RestError, RestResponse
+from wt_data.binance.um.rest import (
+    BinanceUmRest,
+    RateLimitedError,
+    RestError,
+    RestResponse,
+    RestrictedLocationError,
+)
 from wt_data.binance.um.streams import (
     ConnectionSpec,
     build_groups,
@@ -178,6 +184,8 @@ class Collector:
         self._snapshot_pending: set[str] = set()
         self._snapshot_seq = 0
         self._tasks: list[asyncio.Task[None]] = []
+        self._planned_kinds: dict[str, int] = {}  # stream kind -> mono ns when it was first planned
+        self._silent_warned: set[str] = set()
         self.ready = asyncio.Event()  # set once the first plan is running
 
     # ================================================================== lifecycle
@@ -221,6 +229,10 @@ class Collector:
                 info = await self._fetch_exchange_info()
                 tickers = await self._fetch_tickers()
                 break
+            except RestrictedLocationError as exc:
+                log.critical("%s", exc)
+                self._record_control("restricted_location", {"error": str(exc)})
+                raise
             except RestError as exc:
                 log.warning("bootstrap failed (%s); retrying in %.0fs", exc, delay)
                 self._record_control("bootstrap_failed", {"error": str(exc)})
@@ -322,6 +334,9 @@ class Collector:
         for running in starting:
             self._running[running.spec.name] = running
         self.metrics.ws_streams.set(len(self._running))
+        now_ns = self.clock.now().mono_ns
+        kinds = {stream_kind(stream) for spec in plan for stream in spec.streams}
+        self._planned_kinds = {k: self._planned_kinds.get(k, now_ns) for k in kinds}
 
     def _start_stream(self, spec: ConnectionSpec) -> _RunningStream:
         stream = ManagedStream(
@@ -461,8 +476,28 @@ class Collector:
                 self.metrics.agg_trade_missing.labels(symbol).inc(count)
             self.metrics.rest_blocked_s.set(self.rest.blocked_for_s)
 
+    def _check_silent_kinds(self, now: Stamp) -> list[str]:
+        """Planned stream kinds that never delivered data: usually a wrong route or stream name."""
+        seen = self.quality.seconds_since_last(now)
+        limit_ns = round(self.cfg.quality.silent_kind_warning_s * 1_000_000_000)
+        silent = []
+        for kind, planned_at in self._planned_kinds.items():
+            if kind not in seen and now.mono_ns - planned_at >= limit_ns and kind not in self._silent_warned:
+                self._silent_warned.add(kind)
+                silent.append(kind)
+                route = self.cfg.exchange.effective_routes.get(kind)
+                log.error(
+                    "no data for planned stream kind %r after %.0fs (route %s) — check exchange.routes",
+                    kind,
+                    self.cfg.quality.silent_kind_warning_s,
+                    route,
+                )
+                self._record_control("stream_kind_silent", {"kind": kind, "route": str(route)})
+        return silent
+
     async def _quality_tick(self) -> None:
         now = self.clock.now()
+        self._check_silent_kinds(now)
         summary = self.quality.summary_and_reset(now)
         summary["books"] = {
             s: {"state": b.state.value, "valid": b.is_valid, **dataclasses.asdict(b.stats)}

@@ -1,0 +1,478 @@
+{
+  "hypothesis": "H-001",
+  "development": {
+    "n": 12439,
+    "win_rate": 0.3421,
+    "mean_r": -0.2826,
+    "median_r": -1.1565,
+    "t_stat": -21.896,
+    "profit_factor": 0.67,
+    "sum_r": -3515.85,
+    "max_drawdown_r": 3523.67
+  },
+  "development_gross_mean_r": 0.0063,
+  "development_mean_cost_r": 0.289,
+  "baseline_random": {
+    "n": 248780,
+    "win_rate": 0.3432,
+    "mean_r": -0.2916,
+    "median_r": -1.1545,
+    "t_stat": -102.912,
+    "profit_factor": 0.654,
+    "sum_r": -72555.51,
+    "max_drawdown_r": 72563.8
+  },
+  "by_year": {
+    "2023": {
+      "n": 4939,
+      "win_rate": 0.3586,
+      "mean_r": -0.2631,
+      "median_r": -1.1597,
+      "t_stat": -12.796,
+      "profit_factor": 0.689,
+      "sum_r": -1299.29,
+      "max_drawdown_r": 1314.03
+    },
+    "2024": {
+      "n": 5020,
+      "win_rate": 0.3329,
+      "mean_r": -0.2947,
+      "median_r": -1.155,
+      "t_stat": -14.539,
+      "profit_factor": 0.659,
+      "sum_r": -1479.39,
+      "max_drawdown_r": 1484.13
+    },
+    "2025H1": {
+      "n": 2480,
+      "win_rate": 0.3282,
+      "mean_r": -0.2972,
+      "median_r": -1.1528,
+      "t_stat": -10.302,
+      "profit_factor": 0.657,
+      "sum_r": -737.17,
+      "max_drawdown_r": 740.42
+    }
+  },
+  "by_side": {
+    "long": {
+      "n": 6013,
+      "win_rate": 0.3449,
+      "mean_r": -0.2675,
+      "median_r": -1.1502,
+      "t_stat": -14.453,
+      "profit_factor": 0.684,
+      "sum_r": -1608.53,
+      "max_drawdown_r": 1634.34
+    },
+    "short": {
+      "n": 6426,
+      "win_rate": 0.3396,
+      "mean_r": -0.2968,
+      "median_r": -1.1634,
+      "t_stat": -16.479,
+      "profit_factor": 0.658,
+      "sum_r": -1907.32,
+      "max_drawdown_r": 1915.89
+    }
+  },
+  "by_exit": {
+    "TARGET": 3999,
+    "STOP": 8100,
+    "TIME": 340
+  },
+  "by_symbol": {
+    "BTCUSDT": {
+      "n": 598,
+      "win_rate": 0.3428,
+      "mean_r": -0.3737,
+      "median_r": -1.2215,
+      "t_stat": -6.325,
+      "profit_factor": 0.591,
+      "sum_r": -223.5,
+      "max_drawdown_r": 222.03
+    },
+    "ETHUSDT": {
+      "n": 636,
+      "win_rate": 0.3805,
+      "mean_r": -0.1958,
+      "median_r": -1.1678,
+      "t_stat": -3.405,
+      "profit_factor": 0.758,
+      "sum_r": -124.52,
+      "max_drawdown_r": 128.78
+    },
+    "BNBUSDT": {
+      "n": 598,
+      "win_rate": 0.3645,
+      "mean_r": -0.3375,
+      "median_r": -1.2227,
+      "t_stat": -5.663,
+      "profit_factor": 0.625,
+      "sum_r": -201.82,
+      "max_drawdown_r": 201.76
+    },
+    "SOLUSDT": {
+      "n": 636,
+      "win_rate": 0.3223,
+      "mean_r": -0.2863,
+      "median_r": -1.1524,
+      "t_stat": -5.09,
+      "profit_factor": 0.663,
+      "sum_r": -182.11,
+      "max_drawdown_r": 200.33
+    },
+    "XRPUSDT": {
+      "n": 592,
+      "win_rate": 0.3446,
+      "mean_r": -0.2732,
+      "median_r": -1.1474,
+      "t_stat": -4.656,
+      "profit_factor": 0.676,
+      "sum_r": -161.75,
+      "max_drawdown_r": 172.91
+    },
+    "DOGEUSDT": {
+      "n": 633,
+      "win_rate": 0.3239,
+      "mean_r": -0.313,
+      "median_r": -1.1333,
+      "t_stat": -5.536,
+      "profit_factor": 0.637,
+      "sum_r": -198.14,
+      "max_drawdown_r": 201.53
+    },
+    "ADAUSDT": {
+      "n": 624,
+      "win_rate": 0.3317,
+      "mean_r": -0.2992,
+      "median_r": -1.1646,
+      "t_stat": -5.179,
+      "profit_factor": 0.656,
+      "sum_r": -186.71,
+      "max_drawdown_r": 192.03
+    },
+    "AVAXUSDT": {
+      "n": 628,
+      "win_rate": 0.336,
+      "mean_r": -0.2747,
+      "median_r": -1.144,
+      "t_stat": -4.802,
+      "profit_factor": 0.676,
+      "sum_r": -172.49,
+      "max_drawdown_r": 179.67
+    },
+    "LINKUSDT": {
+      "n": 649,
+      "win_rate": 0.3436,
+      "mean_r": -0.24,
+      "median_r": -1.1455,
+      "t_stat": -4.258,
+      "profit_factor": 0.71,
+      "sum_r": -155.75,
+      "max_drawdown_r": 159.21
+    },
+    "LTCUSDT": {
+      "n": 613,
+      "win_rate": 0.3883,
+      "mean_r": -0.1623,
+      "median_r": -1.1503,
+      "t_stat": -2.714,
+      "profit_factor": 0.799,
+      "sum_r": -99.51,
+      "max_drawdown_r": 120.01
+    },
+    "DOTUSDT": {
+      "n": 644,
+      "win_rate": 0.2997,
+      "mean_r": -0.3848,
+      "median_r": -1.1753,
+      "t_stat": -6.958,
+      "profit_factor": 0.574,
+      "sum_r": -247.83,
+      "max_drawdown_r": 246.47
+    },
+    "TRXUSDT": {
+      "n": 517,
+      "win_rate": 0.3288,
+      "mean_r": -0.483,
+      "median_r": -1.2872,
+      "t_stat": -7.554,
+      "profit_factor": 0.513,
+      "sum_r": -249.69,
+      "max_drawdown_r": 249.12
+    },
+    "BCHUSDT": {
+      "n": 644,
+      "win_rate": 0.3742,
+      "mean_r": -0.1691,
+      "median_r": -1.1254,
+      "t_stat": -2.956,
+      "profit_factor": 0.788,
+      "sum_r": -108.9,
+      "max_drawdown_r": 117.21
+    },
+    "ATOMUSDT": {
+      "n": 649,
+      "win_rate": 0.339,
+      "mean_r": -0.294,
+      "median_r": -1.1709,
+      "t_stat": -5.218,
+      "profit_factor": 0.659,
+      "sum_r": -190.83,
+      "max_drawdown_r": 196.52
+    },
+    "NEARUSDT": {
+      "n": 624,
+      "win_rate": 0.3237,
+      "mean_r": -0.2657,
+      "median_r": -1.1367,
+      "t_stat": -4.663,
+      "profit_factor": 0.683,
+      "sum_r": -165.79,
+      "max_drawdown_r": 168.3
+    },
+    "FILUSDT": {
+      "n": 626,
+      "win_rate": 0.3179,
+      "mean_r": -0.3125,
+      "median_r": -1.1529,
+      "t_stat": -5.568,
+      "profit_factor": 0.635,
+      "sum_r": -195.63,
+      "max_drawdown_r": 202.35
+    },
+    "ETCUSDT": {
+      "n": 638,
+      "win_rate": 0.3668,
+      "mean_r": -0.2174,
+      "median_r": -1.1483,
+      "t_stat": -3.736,
+      "profit_factor": 0.739,
+      "sum_r": -138.72,
+      "max_drawdown_r": 141.21
+    },
+    "UNIUSDT": {
+      "n": 632,
+      "win_rate": 0.3513,
+      "mean_r": -0.2062,
+      "median_r": -1.1356,
+      "t_stat": -3.56,
+      "profit_factor": 0.749,
+      "sum_r": -130.32,
+      "max_drawdown_r": 132.1
+    },
+    "XLMUSDT": {
+      "n": 609,
+      "win_rate": 0.33,
+      "mean_r": -0.3507,
+      "median_r": -1.1849,
+      "t_stat": -6.023,
+      "profit_factor": 0.609,
+      "sum_r": -213.55,
+      "max_drawdown_r": 216.95
+    },
+    "AAVEUSDT": {
+      "n": 649,
+      "win_rate": 0.3328,
+      "mean_r": -0.2593,
+      "median_r": -1.1312,
+      "t_stat": -4.618,
+      "profit_factor": 0.691,
+      "sum_r": -168.29,
+      "max_drawdown_r": 169.14
+    }
+  },
+  "data": {
+    "BTCUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 449,
+      "short_signals": 505,
+      "conflicts": 2,
+      "skipped_busy": 33,
+      "skipped_risk": 59
+    },
+    "ETHUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 476,
+      "short_signals": 488,
+      "conflicts": 2,
+      "skipped_busy": 37,
+      "skipped_risk": 18
+    },
+    "BNBUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 444,
+      "short_signals": 504,
+      "conflicts": 0,
+      "skipped_busy": 18,
+      "skipped_risk": 75
+    },
+    "SOLUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 445,
+      "short_signals": 495,
+      "conflicts": 0,
+      "skipped_busy": 20,
+      "skipped_risk": 10
+    },
+    "XRPUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 460,
+      "short_signals": 443,
+      "conflicts": 1,
+      "skipped_busy": 24,
+      "skipped_risk": 23
+    },
+    "DOGEUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 472,
+      "short_signals": 485,
+      "conflicts": 0,
+      "skipped_busy": 30,
+      "skipped_risk": 20
+    },
+    "ADAUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 477,
+      "short_signals": 463,
+      "conflicts": 1,
+      "skipped_busy": 20,
+      "skipped_risk": 5
+    },
+    "AVAXUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 468,
+      "short_signals": 467,
+      "conflicts": 1,
+      "skipped_busy": 23,
+      "skipped_risk": 12
+    },
+    "LINKUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 460,
+      "short_signals": 494,
+      "conflicts": 0,
+      "skipped_busy": 17,
+      "skipped_risk": 12
+    },
+    "LTCUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 447,
+      "short_signals": 495,
+      "conflicts": 1,
+      "skipped_busy": 25,
+      "skipped_risk": 29
+    },
+    "DOTUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 487,
+      "short_signals": 461,
+      "conflicts": 1,
+      "skipped_busy": 16,
+      "skipped_risk": 20
+    },
+    "TRXUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 385,
+      "short_signals": 499,
+      "conflicts": 1,
+      "skipped_busy": 21,
+      "skipped_risk": 162
+    },
+    "BCHUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 483,
+      "short_signals": 473,
+      "conflicts": 2,
+      "skipped_busy": 30,
+      "skipped_risk": 16
+    },
+    "ATOMUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 490,
+      "short_signals": 472,
+      "conflicts": 0,
+      "skipped_busy": 14,
+      "skipped_risk": 13
+    },
+    "NEARUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 437,
+      "short_signals": 481,
+      "conflicts": 0,
+      "skipped_busy": 12,
+      "skipped_risk": 10
+    },
+    "FILUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 455,
+      "short_signals": 457,
+      "conflicts": 3,
+      "skipped_busy": 17,
+      "skipped_risk": 9
+    },
+    "ETCUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 486,
+      "short_signals": 458,
+      "conflicts": 0,
+      "skipped_busy": 21,
+      "skipped_risk": 16
+    },
+    "UNIUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 465,
+      "short_signals": 459,
+      "conflicts": 0,
+      "skipped_busy": 22,
+      "skipped_risk": 12
+    },
+    "XLMUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 471,
+      "short_signals": 440,
+      "conflicts": 3,
+      "skipped_busy": 19,
+      "skipped_risk": 23
+    },
+    "AAVEUSDT": {
+      "bars": 125568,
+      "gaps": 0,
+      "long_signals": 449,
+      "short_signals": 496,
+      "conflicts": 0,
+      "skipped_busy": 16,
+      "skipped_risk": 17
+    }
+  },
+  "criteria": {
+    "trades >= 300": true,
+    "mean R >= 0.05": false,
+    "t-stat >= 2.0": false,
+    "profit factor >= 1.15": false,
+    "positive every year": false,
+    "beats random baseline by >= 0.10R": false
+  },
+  "development_decision": "REJECTED",
+  "validation": "not evaluated (development rejected) — per pre-registration"
+}

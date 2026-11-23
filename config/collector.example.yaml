@@ -83,6 +83,7 @@ quality:
   summary_interval_s: 60
   reorder_window_s: 2.0
   book_reorder_window_s: 1.5
+  silent_kind_warning_s: 300               # planned stream kind with no data => check routes
 
 metrics:
   enabled: true

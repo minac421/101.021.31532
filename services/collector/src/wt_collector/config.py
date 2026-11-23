@@ -115,6 +115,7 @@ class QualityConfig(_Section, frozen=True):
     summary_interval_s: PositiveFloat = 60.0
     reorder_window_s: PositiveFloat = 2.0
     book_reorder_window_s: PositiveFloat = 1.5
+    silent_kind_warning_s: PositiveFloat = 300.0  # planned stream kind with no data -> routing/plan problem
 
 
 class MetricsConfig(_Section, frozen=True):

@@ -6,6 +6,7 @@ from wt_data.binance.um.rest import (
     MinuteWeightBudget,
     RateLimitedError,
     RestError,
+    RestrictedLocationError,
     TransientError,
     WindowCountBudget,
 )
@@ -94,3 +95,16 @@ async def test_unsupported_depth_limit() -> None:
     async with _client(httpx.MockTransport(lambda r: httpx.Response(200))) as rest:
         with pytest.raises(ValueError, match="depth limit"):
             await rest.depth("BTCUSDT", 7)
+
+
+async def test_restricted_location_is_fatal_not_transient() -> None:
+    body = b'{"code":0,"msg":"Service unavailable from a restricted location"}'
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(451, content=body)
+
+    async with _client(httpx.MockTransport(handler)) as rest:
+        with pytest.raises(RestrictedLocationError, match="eligible jurisdiction") as info:
+            await rest.exchange_info()
+    assert info.value.status == 451
+    assert not isinstance(info.value, TransientError | RateLimitedError)

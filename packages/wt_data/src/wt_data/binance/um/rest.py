@@ -56,6 +56,10 @@ class RateLimitedError(RestError):
         self.retry_after_s = retry_after_s
 
 
+class RestrictedLocationError(RestError):
+    """HTTP 451: Binance refuses to serve this server's location. Retrying cannot help."""
+
+
 @dataclass(frozen=True, slots=True)
 class RestResponse:
     path: str
@@ -205,6 +209,13 @@ class BinanceUmRest:
             )
             raise RateLimitedError(
                 f"HTTP {status} on {path}", status=status, retry_after_s=retry_after, body=response.content
+            )
+        if status == 451:
+            raise RestrictedLocationError(
+                f"HTTP 451 on {path}: Binance does not serve this server's location "
+                "(see 'Eligibility' in the Binance terms) — run from an eligible jurisdiction",
+                status=status,
+                body=response.content,
             )
         if status >= 500:
             raise TransientError(f"HTTP {status} on {path}", status=status, body=response.content)

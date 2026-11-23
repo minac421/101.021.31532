@@ -16,6 +16,9 @@ dev = [
     "import-linter>=2.1",
     "types-PyYAML>=6.0",
 ]
+research = [
+    "numpy>=2.0",
+]
 
 [tool.uv]
 package = false
