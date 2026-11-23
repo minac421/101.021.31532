@@ -1,0 +1,149 @@
+{
+  "hypothesis": "H-002",
+  "baseline_buy_and_hold": {
+    "development": {
+      "days": 880,
+      "total_return": 0.8438,
+      "ann_return": 0.4528,
+      "ann_vol": 0.6307,
+      "sharpe": 0.718,
+      "t_stat": 1.115,
+      "max_drawdown": 0.561
+    },
+    "by_year": {
+      "2023": {
+        "days": 333,
+        "total_return": 0.4423,
+        "ann_return": 0.537,
+        "ann_vol": 0.5223,
+        "sharpe": 1.028,
+        "t_stat": 0.982,
+        "max_drawdown": 0.3156
+      },
+      "2024": {
+        "days": 366,
+        "total_return": 0.6939,
+        "ann_return": 0.7449,
+        "ann_vol": 0.6615,
+        "sharpe": 1.126,
+        "t_stat": 1.128,
+        "max_drawdown": 0.4666
+      },
+      "2025H1": {
+        "days": 181,
+        "total_return": -0.2453,
+        "ann_return": -0.2931,
+        "ann_vol": 0.7414,
+        "sharpe": -0.395,
+        "t_stat": -0.278,
+        "max_drawdown": 0.5041
+      }
+    }
+  },
+  "H-002a": {
+    "development": {
+      "days": 880,
+      "total_return": 0.323,
+      "ann_return": 0.1526,
+      "ann_vol": 0.2707,
+      "sharpe": 0.564,
+      "t_stat": 0.875,
+      "max_drawdown": 0.3037
+    },
+    "by_year": {
+      "2023": {
+        "days": 333,
+        "total_return": 0.2924,
+        "ann_return": 0.3159,
+        "ann_vol": 0.2641,
+        "sharpe": 1.196,
+        "t_stat": 1.143,
+        "max_drawdown": 0.1162
+      },
+      "2024": {
+        "days": 366,
+        "total_return": 0.1688,
+        "ann_return": 0.1908,
+        "ann_vol": 0.2664,
+        "sharpe": 0.716,
+        "t_stat": 0.717,
+        "max_drawdown": 0.3037
+      },
+      "2025H1": {
+        "days": 181,
+        "total_return": -0.1242,
+        "ann_return": -0.2251,
+        "ann_vol": 0.2913,
+        "sharpe": -0.773,
+        "t_stat": -0.544,
+        "max_drawdown": 0.1482
+      }
+    },
+    "avg_gross_exposure": 0.641,
+    "avg_daily_turnover": 0.1272,
+    "funding_drag_ann": 0.0194,
+    "criteria": {
+      ">= 700 days": true,
+      "Sharpe >= 0.8": false,
+      "t-stat >= 2.0": false,
+      "positive every year": false,
+      "max drawdown <= 30%": false,
+      "Sharpe >= buy-and-hold": false
+    },
+    "development_decision": "REJECTED",
+    "validation": "not evaluated (development rejected) — per pre-registration"
+  },
+  "H-002b": {
+    "development": {
+      "days": 880,
+      "total_return": 0.6824,
+      "ann_return": 0.2386,
+      "ann_vol": 0.2142,
+      "sharpe": 1.114,
+      "t_stat": 1.73,
+      "max_drawdown": 0.209
+    },
+    "by_year": {
+      "2023": {
+        "days": 333,
+        "total_return": 0.2956,
+        "ann_return": 0.3073,
+        "ann_vol": 0.2169,
+        "sharpe": 1.417,
+        "t_stat": 1.354,
+        "max_drawdown": 0.0898
+      },
+      "2024": {
+        "days": 366,
+        "total_return": 0.4105,
+        "ann_return": 0.3693,
+        "ann_vol": 0.2297,
+        "sharpe": 1.608,
+        "t_stat": 1.61,
+        "max_drawdown": 0.209
+      },
+      "2025H1": {
+        "days": 181,
+        "total_return": -0.0793,
+        "ann_return": -0.152,
+        "ann_vol": 0.1727,
+        "sharpe": -0.88,
+        "t_stat": -0.62,
+        "max_drawdown": 0.1203
+      }
+    },
+    "avg_gross_exposure": 0.303,
+    "avg_daily_turnover": 0.063,
+    "funding_drag_ann": 0.0293,
+    "criteria": {
+      ">= 700 days": true,
+      "Sharpe >= 0.8": true,
+      "t-stat >= 2.0": false,
+      "positive every year": false,
+      "max drawdown <= 30%": true,
+      "Sharpe >= buy-and-hold": true
+    },
+    "development_decision": "REJECTED",
+    "validation": "not evaluated (development rejected) — per pre-registration"
+  }
+}
