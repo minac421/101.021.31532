@@ -1,0 +1,38 @@
+# Phase 0/1 stack: the read-only recorder + Prometheus (alerts on data health).
+#   docker compose -f infra/docker-compose.yml up -d --build
+# Ports are bound to localhost only; reach them through the VPN / an SSH tunnel.
+name: whale-trader
+
+services:
+  collector:
+    build:
+      context: ..
+      dockerfile: services/collector/Dockerfile
+    image: whale-trader/collector:0.1.0
+    restart: unless-stopped
+    stop_grace_period: 60s          # lets the recorder flush and close its files
+    volumes:
+      - ./collector.docker.yaml:/etc/wt/collector.yaml:ro
+      - wt-raw:/data
+    ports:
+      - "127.0.0.1:9108:9108"
+    logging:
+      driver: json-file
+      options: {max-size: "50m", max-file: "5"}
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=90d
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
+      - prom-data:/prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+
+volumes:
+  wt-raw: {}
+  prom-data: {}

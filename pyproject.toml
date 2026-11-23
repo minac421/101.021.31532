@@ -1,0 +1,85 @@
+[project]
+name = "whale-trader"
+version = "0.1.0"
+description = "AI Whale Trader — workspace root (design: docs/)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["wt-core", "wt-data", "wt-collector"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "hypothesis>=6.120",
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "import-linter>=2.1",
+    "types-PyYAML>=6.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["packages/*", "services/*"]
+
+[tool.uv.sources]
+wt-core = { workspace = true }
+wt-data = { workspace = true }
+wt-collector = { workspace = true }
+
+# ----------------------------------------------------------------------------- ruff
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+src = ["packages/wt_core/src", "packages/wt_data/src", "services/collector/src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "ASYNC", "PT", "C4", "PIE", "RET", "TID"]
+ignore = ["RUF001", "RUF002", "RUF003"]   # Arabic text in docstrings/comments is intentional
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+# ----------------------------------------------------------------------------- mypy
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
+mypy_path = ["packages/wt_core/src", "packages/wt_data/src", "services/collector/src"]
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = ["sortedcontainers.*", "zstandard.*"]
+ignore_missing_imports = true
+
+# ----------------------------------------------------------------------------- pytest
+[tool.pytest.ini_options]
+testpaths = ["packages/wt_core/tests", "packages/wt_data/tests", "services/collector/tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-ra --strict-markers --import-mode=importlib"
+markers = ["integration: tests that run the collector against a local fake exchange"]
+
+# ----------------------------------------------------------------------------- import-linter
+# Architecture boundaries from docs/01-system-architecture.md §10, enforced in CI.
+[tool.importlinter]
+root_packages = ["wt_core", "wt_data", "wt_collector"]
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Layers: services -> data -> core (no upward imports)"
+type = "layers"
+layers = ["wt_collector", "wt_data", "wt_core"]
+
+[[tool.importlinter.contracts]]
+name = "wt_core stays free of I/O and framework dependencies"
+type = "forbidden"
+source_modules = ["wt_core"]
+forbidden_modules = ["websockets", "httpx", "zstandard", "prometheus_client", "yaml"]
+
+[[tool.importlinter.contracts]]
+name = "wt_data has no service/ops dependencies (metrics, config files)"
+type = "forbidden"
+source_modules = ["wt_data"]
+forbidden_modules = ["prometheus_client", "yaml"]

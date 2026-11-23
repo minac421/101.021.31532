@@ -1,0 +1,7 @@
+# Container overrides for wt-collector (all other keys use the defaults in
+# config/collector.example.yaml). Edit freely; unknown keys are rejected.
+recorder:
+  root: /data/raw
+metrics:
+  host: 0.0.0.0
+  port: 9108

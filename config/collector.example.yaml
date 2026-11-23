@@ -1,0 +1,90 @@
+# =============================================================================
+# wt-collector — read-only Binance USD-M market data recorder (example config)
+# -----------------------------------------------------------------------------
+# Public endpoints only: no API keys, never places orders.
+# Copy to config/collector.local.yaml (git-ignored), adjust, then:
+#   uv run wt-collector check-config --config config/collector.local.yaml
+#   uv run wt-collector run --config config/collector.local.yaml
+# Every key is optional; omitted keys use the defaults shown here.
+# =============================================================================
+
+exchange:
+  rest_base_url: https://fapi.binance.com
+  ws_base_url: wss://fstream.binance.com      # routed paths /public and /market are appended
+  # Default routing (verified: depth, bookTicker -> public; aggTrade, markPrice, kline -> market).
+  # Re-check the others against the official routing table and override here if needed:
+  routes: {}
+  #   forceOrder: market
+  #   contractInfo: market
+  max_streams_per_connection: 150             # Binance hard limit is 200
+  max_url_length: 7000
+
+universe:
+  quote_asset: USDT
+  contract_types: [PERPETUAL]
+  status: TRADING
+  underlying_types: [COIN]                    # excludes non-crypto (TradFi) perpetuals
+  include: []
+  exclude: []
+  max_symbols: null                           # e.g. 200 to keep only the most liquid
+  refresh_s: 600
+
+focus:                                        # symbols that get full order books
+  static: [BTCUSDT, ETHUSDT]
+  top_by_quote_volume: 28
+  refresh_s: 86400
+
+streams:
+  per_symbol: [aggTrade]                      # every universe symbol
+  focus: ["depth@100ms", bookTicker]          # focus symbols only
+  market_wide: ["!markPrice@arr@1s", "!forceOrder@arr", "!miniTicker@arr", "!contractInfo"]
+
+ws:
+  max_age_s: 82800                            # rotate (with overlap) before the 24h server cut
+  rotation_overlap_s: 5
+  silence_timeout_s: 60
+  open_timeout_s: 15
+  backoff_initial_s: 0.5
+  backoff_max_s: 30
+  use_env_proxy: true
+
+rest:
+  timeout_s: 10
+  weight_limit_per_minute: null               # null = read REQUEST_WEIGHT from exchangeInfo
+  max_weight_fraction: 0.5                    # leave the other half of the IP budget for trading
+  futures_data_requests_per_5min: 600
+  ca_bundle: null
+
+pollers:
+  exchange_info_s: 600
+  server_time_s: 60
+  open_interest_s: 300
+  futures_stats_period: 5m
+  futures_stats_focus_s: 300
+  futures_stats_other_s: 3600
+  futures_stats_endpoints:
+    - openInterestHist
+    - topLongShortAccountRatio
+    - topLongShortPositionRatio
+    - globalLongShortAccountRatio
+    - takerlongshortRatio
+  depth_snapshot_limit: 1000
+  depth_anchor_s: 1800
+  funding_info_s: 86400
+
+recorder:
+  root: ./data/raw
+  source: binance-um
+  zstd_level: 3
+  flush_interval_s: 2
+  queue_max: 200000
+
+quality:
+  summary_interval_s: 60
+  reorder_window_s: 2.0
+  book_reorder_window_s: 1.5
+
+metrics:
+  enabled: true
+  host: 0.0.0.0
+  port: 9108

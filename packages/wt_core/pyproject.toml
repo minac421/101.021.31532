@@ -1,0 +1,13 @@
+[project]
+name = "wt-core"
+version = "0.1.0"
+description = "Dependency-light shared primitives: clocks, health states, contracts"
+requires-python = ">=3.12"
+dependencies = ["msgspec>=0.18"]
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/wt_core"]

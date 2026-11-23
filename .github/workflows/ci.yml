@@ -1,0 +1,76 @@
+name: ci
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install uv==0.11.32
+      - run: uv sync --frozen --python ${{ matrix.python }}
+      - name: Lint and format
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+      - name: Type check (strict)
+        run: uv run mypy packages/wt_core/src packages/wt_data/src services/collector/src
+      - name: Architecture boundaries
+        run: uv run lint-imports
+      - name: Tests (unit, property-based, fake-exchange integration)
+        run: uv run pytest -q
+      - name: Example configuration is valid
+        run: uv run wt-collector check-config --config config/collector.example.yaml
+      - name: Documentation links
+        run: uv run python tools/check_docs_links.py
+
+  database-governance:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: wt_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: ci
+      PGDATABASE: wt_test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply the core schema
+        run: psql -v ON_ERROR_STOP=1 -q -f db/postgres/001_core_schema.sql
+      - name: Governance tests (capital-protection rules enforced by the database)
+        run: |
+          psql -q -f db/postgres/tests/governance_tests.sql > governance.log 2>&1 || true
+          cat governance.log | grep -E "PASS|FAIL|ERROR" || true
+          test "$(grep -c 'PASS' governance.log)" -eq 29
+          ! grep -qE 'FAIL|ERROR' governance.log
+
+  clickhouse-schema:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install chdb==4.5.1
+      - run: python tools/validate_clickhouse_schema.py db/clickhouse/001_market_data.sql

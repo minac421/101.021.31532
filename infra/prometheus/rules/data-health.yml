@@ -1,0 +1,62 @@
+# Data-health alerts for the recorder (docs/03-data-sources.md §9, docs/10-operations-security.md §2).
+groups:
+  - name: data-health
+    rules:
+      - alert: CollectorDown
+        expr: up{job="collector"} == 0
+        for: 2m
+        labels: {severity: P2}
+        annotations:
+          summary: "wt-collector is not being scraped — recording may have stopped"
+
+      - alert: RecorderDroppingRecords
+        expr: increase(wt_recorder_dropped[5m]) > 0
+        labels: {severity: P2}
+        annotations:
+          summary: "raw recorder queue is full and records are being dropped (data DEGRADED)"
+
+      - alert: RecorderWriteErrors
+        expr: increase(wt_recorder_write_errors[10m]) > 0
+        labels: {severity: P2}
+        annotations:
+          summary: "raw recorder cannot write to disk"
+
+      - alert: TradeStreamStale
+        expr: wt_last_message_age_seconds{kind="aggTrade"} > 30
+        for: 2m
+        labels: {severity: P2}
+        annotations:
+          summary: "no aggregate trades received for more than 30s"
+
+      - alert: OrderBooksNotLive
+        expr: avg(wt_book_live) < 0.9
+        for: 5m
+        labels: {severity: P2}
+        annotations:
+          summary: "more than 10% of focus order books are not live"
+
+      - alert: AggTradeIdsMissing
+        expr: increase(wt_agg_trade_missing_ids_total[15m]) > 100
+        labels: {severity: P3}
+        annotations:
+          summary: "{{ $labels.symbol }}: aggregate trades missing (fill from the daily archive)"
+
+      - alert: ClockOffsetHigh
+        expr: abs(wt_clock_offset_ms) > 250
+        for: 5m
+        labels: {severity: P2}
+        annotations:
+          summary: "local clock is {{ $value }} ms away from the exchange — check chrony"
+
+      - alert: RestRateLimited
+        expr: wt_rest_blocked_seconds > 0
+        labels: {severity: P1}
+        annotations:
+          summary: "REST calls paused after HTTP 429/418 — the IP budget is shared with trading"
+
+      - alert: DiskSpaceLow
+        expr: wt_disk_free_bytes < 20e9
+        for: 10m
+        labels: {severity: P2}
+        annotations:
+          summary: "less than 20 GB free on the recording volume"
